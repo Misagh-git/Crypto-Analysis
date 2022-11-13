@@ -15,12 +15,14 @@ m15symbol = [m.strip('_M15.csv') for m in m15files]
 
 target_sym = []
 for x in h1symbol:
-    if m15symbol.count(x) == 0 :
-			#and func.is_downloadable(x):
+    if m15symbol.count(x) == 0 and func.is_downloadable(x):
         target_sym.append(x)
+
 #main(target_sym[1])
+
 print(len(target_sym))
-#with ThreadPoolExecutor(max_workers=10) as pool:
-	#futures = [pool.submit(main, symbol) for symbol in target_sym]
-	#for future in as_completed(futures):
-		#result = future.result()
+
+with ThreadPoolExecutor(max_workers=10) as pool:
+	futures = [pool.submit(main, symbol) for symbol in target_sym]
+	for future in as_completed(futures):
+		result = future.result()
