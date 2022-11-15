@@ -1,17 +1,36 @@
 import pandas as pd
 import functions as func
 import os
+import re
 
-df = pd.read_csv('D:/Kucoin_Spot/BTC-USDT_H1.csv')
-df.rename(columns={'Time': 'unixtime'}, inplace=True)
-df.insert(0, 'DATE', (pd.to_datetime(df['unixtime'], unit='s')).dt.date)
-df.insert(1, 'TIME', (pd.to_datetime(df['unixtime'], unit='s')).dt.time)
-columnsTitles = ['DATE', 'TIME', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME', 'AMOUNT', 'unixtime']
-df = df.reindex(columns=columnsTitles)
-df['diff'] = df['unixtime'].diff()
-df=func.computeMACD(df,12,26,9)
-df=func.computeICHIMUKO(df,9,26,52)
+# green is below of price in asc trend
 
-all_files = os.listdir('D:/Kucoin_Spot/')
+rootfolder = 'D:/Main_Spot/'
+all_files = os.listdir(rootfolder)
 h1files = [x for x in all_files if "H1" in x]
 m15files = [x for x in all_files if "M15" in x]
+
+h1chart_collection = []
+m15chart_collection = []
+
+for x in h1files:
+    h1chart_collection.append(pd.read_csv(rootfolder + x))
+    h1chart_collection[len(h1chart_collection) - 1].name = re.sub('_H1.csv', '', x)
+
+for x in m15files:
+    m15chart_collection.append(pd.read_csv(rootfolder + x))
+    m15chart_collection[len(m15chart_collection) - 1].name = re.sub('_M15.csv', '', x)
+
+for x in h1chart_collection:
+    func.insertdatetimecolumn(x)
+    func.computeICHIMUKO(x, 9, 26, 52)
+
+for x in m15chart_collection:
+    func.insertdatetimecolumn(x)
+    func.computeMACD(x, 12, 26, 9)
+    ch_h1= [y for y in h1chart_collection if x.name == y.name][0]
+    x['MACD'].shift<x['']
+
+m15chart_collection[0].to_csv('D:/btc.csv')
+
+print(h1chart_collection[0].name)

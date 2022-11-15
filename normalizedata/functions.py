@@ -1,16 +1,24 @@
 import pandas as pd
 
 
+def insertdatetimecolumn(df):
+    df.rename(columns={'Time': 'unixtime'}, inplace=True)
+    data = df['unixtime']
+    df.insert(0, 'DATE', (pd.to_datetime(data, unit='s')).dt.date)
+    df.insert(1, 'TIME', (pd.to_datetime(data, unit='s')).dt.time)
+    columnstitles = ['DATE', 'TIME', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME', 'AMOUNT', 'unixtime']
+    df = df.reindex(columns=columnstitles)
+    df['diff'] = df['unixtime'].diff()
+    return df
+
+
+
 def computeMACD(df, n_fast, n_slow, n_smooth):
-    data = df['CLOSE']
-    fastEMA = data.ewm(span=n_fast, min_periods=n_slow).mean()
-    slowEMA = data.ewm(span=n_slow, min_periods=n_slow).mean()
-    MACD = pd.Series(fastEMA - slowEMA, name='MACD')
-    MACDsig = pd.Series(MACD.ewm(span=n_smooth, min_periods=n_smooth).mean(), name='MACDsig')
-    MACDhist = pd.Series(MACD - MACDsig, name='MACDhist')
-    df = df.join(MACD)
-    df = df.join(MACDsig)
-    df = df.join(MACDhist)
+    fastEMA = df['CLOSE'].ewm(span=n_fast, min_periods=n_slow).mean()
+    slowEMA = df['CLOSE'].ewm(span=n_slow, min_periods=n_slow).mean()
+    df['MACD'] = pd.Series(fastEMA - slowEMA, name='MACD')
+    df['MACDsig'] = pd.Series(df['MACD'].ewm(span=n_smooth, min_periods=n_smooth).mean(), name='MACDsig')
+    df['MACDhist'] = pd.Series(df['MACD'] - df['MACDsig'], name='MACDhist')
     return df
 
 def computeICHIMUKO(df, tenken,keyjun,senkob):
