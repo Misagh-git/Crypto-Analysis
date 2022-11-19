@@ -12,7 +12,6 @@ def insertdatetimecolumn(df):
     return df
 
 
-
 def computeMACD(df, n_fast, n_slow, n_smooth):
     fastEMA = df['CLOSE'].ewm(span=n_fast, min_periods=n_slow).mean()
     slowEMA = df['CLOSE'].ewm(span=n_slow, min_periods=n_slow).mean()
@@ -21,7 +20,8 @@ def computeMACD(df, n_fast, n_slow, n_smooth):
     df['MACDhist'] = pd.Series(df['MACD'] - df['Signal'], name='MACDhist')
     return df
 
-def computeICHIMUKO(df, tenken,keyjun,senkob):
+
+def computeICHIMUKO(df, tenken, keyjun, senkob) :
     # Define length of Tenkan Sen or Conversion Line
     cl_period = tenken
 
@@ -48,4 +48,5 @@ def computeICHIMUKO(df, tenken,keyjun,senkob):
     # Calculate lagging span
     df['lagging_span'] = df['CLOSE'].shift(-bl_period)
     return df
+
 
