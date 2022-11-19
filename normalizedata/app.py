@@ -27,6 +27,9 @@ for x in h1chart_collection:
 for x in m15chart_collection:
     func.insertdatetimecolumn(x)
     func.computeMACD(x, 12, 26, 9)
-    ch_h1 = [y for y in h1chart_collection if x.name == y.name][0]
 
+for ind in m15chart_collection[0].index:
+    if ind==1:
+        m15chart_collection[0]['NEWCOL']='HELLO'
 
+print (m15chart_collection[0].iterrows()[0]['CLOSE'])
