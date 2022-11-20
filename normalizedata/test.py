@@ -1,24 +1,16 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-from scipy.signal import argrelextrema
+from matplotlib.pyplot import subplots
+from numpy import linspace, random, sin, cos
+from scipy import interpolate
 
+x = linspace(0, 10)
 
-#df = pd.DataFrame(xs, columns=['data'])
-df = pd.read_csv('D:/BTC-USDT.csv')
-n = 10  # number of points to be checked before and after
+y = sin(2*x * 1.5) + cos (x * 0.5)  + random.randn(x.size) * 1e-1
+# fit spline
+spl = interpolate.InterpolatedUnivariateSpline(x, y)
+fitx = linspace(0, x.max(), 100)
 
-# Find local peaks
+fig, ax = subplots()
+ax.scatter(x, y)
 
-df['min'] = df.iloc[argrelextrema(df.LOW.values, np.less_equal,
-                    order=n)[0]]['LOW']
-df['max'] = df.iloc[argrelextrema(df.HIGH.values, np.greater_equal,
-                    order=n)[0]]['HIGH']
-
-# Plot results
-
-plt.scatter(df.index, df['min'], c='r')
-plt.scatter(df.index, df['max'], c='g')
-plt.plot(df.index, df['CLOSE'])
-plt.show()
-print(df['min'])
+ax.plot(fitx, spl(fitx))
+fig.show()
